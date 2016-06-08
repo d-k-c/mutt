@@ -1037,6 +1037,16 @@ int mutt_log_init (const char *reldate, const char *homedir)
 
   return 0;
 }
+
+int mutt_log_set_level (int level)
+{
+  if (level <= 0)
+    return 0;
+
+  debuglevel = level;
+
+  return level;
+}
 #endif
 
 void mutt_debug (FILE *fp, const char *fmt, ...)

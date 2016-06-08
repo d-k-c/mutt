@@ -587,6 +587,9 @@ int main (int argc, char **argv)
   extern char *optarg;
   extern int optind;
   int double_dash = argc, nargc = 1;
+#ifdef DEBUG
+  int loglevel = 0;
+#endif
 
   /* sanity check against stupid administrators */
   
@@ -674,12 +677,13 @@ int main (int argc, char **argv)
 
       case 'd':
 #ifdef DEBUG
-	if (mutt_atoi (optarg, &debuglevel) < 0 || debuglevel <= 0)
-	{
+        if (mutt_atoi (optarg, &loglevel) < 0 ||
+            !mutt_log_set_level (loglevel))
+        {
 	  fprintf (stderr, _("Error: value '%s' is invalid for -d.\n"), optarg);
 	  return 1;
 	}
-	printf (_("Debugging at level %d.\n"), debuglevel);
+	printf (_("Debugging at level %d.\n"), loglevel);
 #else
 	printf _("DEBUG was not defined during compilation.  Ignored.\n");
 #endif
