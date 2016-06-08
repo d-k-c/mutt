@@ -26,8 +26,6 @@
  * some of our "standard" functions in external programs, too.
  */
 
-#define _LIB_C 1
-
 #if HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -52,6 +50,10 @@
 
 #include "lib.h"
 
+#ifdef DEBUG
+FILE *debugfile = NULL;
+int debuglevel = 0;
+#endif
 
 static const struct sysexits
 {
@@ -1009,6 +1011,33 @@ mutt_strsysexit(int e)
   
   return sysexits_h[i].str;
 }
+
+#ifdef DEBUG
+int mutt_log_init (const char *reldate, const char *homedir)
+{
+  char buf[_POSIX_PATH_MAX];
+  char buf2[_POSIX_PATH_MAX];
+  int i;
+
+  /* rotate the old debug logs */
+  for (i = 3; i >= 0; i--)
+  {
+    snprintf (buf, sizeof(buf), "%s/.muttdebug%d", NONULL(homedir), i);
+    snprintf (buf2, sizeof(buf2), "%s/.muttdebug%d", NONULL(homedir), i + 1);
+    rename (buf, buf2);
+  }
+
+  debugfile = safe_fopen (buf, "w");
+  if (!debugfile)
+    return -1;
+
+  setbuf (debugfile, NULL); /* don't buffer the debugging output! */
+  dprint(1,(debugfile,"Mutt/%s (%s) debugging at level %d\n",
+            MUTT_VERSION, reldate, debuglevel));
+
+  return 0;
+}
+#endif
 
 void mutt_debug (FILE *fp, const char *fmt, ...)
 {
