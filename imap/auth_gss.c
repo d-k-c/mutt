@@ -114,7 +114,7 @@ imap_auth_res_t imap_auth_gss (IMAP_DATA* idata, const char* method)
     return IMAP_AUTH_UNAVAIL;
   }
 #ifdef DEBUG	
-  else if (debuglevel >= 2)
+  else if (mutt_log_get_level () >= 2)
   {
     maj_stat = gss_display_name (&min_stat, target_name, &request_buf,
       &mech_name);

@@ -52,7 +52,7 @@
 
 #ifdef DEBUG
 FILE *debugfile = NULL;
-int debuglevel = 0;
+static int debuglevel = 0;
 #endif
 
 static const struct sysexits
@@ -1046,6 +1046,11 @@ int mutt_log_set_level (int level)
   debuglevel = level;
 
   return level;
+}
+
+int mutt_log_get_level (void)
+{
+  return debuglevel;
 }
 #endif
 

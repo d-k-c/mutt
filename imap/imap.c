@@ -235,7 +235,7 @@ int imap_read_literal (FILE* fp, IMAP_DATA* idata, long bytes, progress_t* pbar)
     if (pbar && !(pos % 1024))
       mutt_progress_update (pbar, pos, -1);
 #ifdef DEBUG
-    if (debuglevel >= IMAP_LOG_LTRL)
+    if (mutt_log_get_level () >= IMAP_LOG_LTRL)
       fputc (c, debugfile);
 #endif
   }
@@ -720,7 +720,7 @@ static int imap_open_mailbox (CONTEXT* ctx)
 
 #ifdef DEBUG
   /* dump the mailbox flags we've found */
-  if (debuglevel > 2)
+  if (mutt_log_get_level () > 2)
   {
     if (!idata->flags)
       dprint (3, (debugfile, "No folder flags found\n"));

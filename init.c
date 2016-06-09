@@ -1350,7 +1350,7 @@ static int parse_alias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
   mutt_alias_add_reverse (tmp);
 
 #ifdef DEBUG
-  if (debuglevel >= 2) 
+  if (mutt_log_get_level () >= 2)
   {
     ADDRESS *a;
     /* A group is terminated with an empty address, so check a->mailbox */
@@ -2941,7 +2941,7 @@ void mutt_init (int skip_sys_rc, LIST *commands)
 
 #ifdef DEBUG
   /* Start up debugging mode if requested */
-  if (debuglevel > 0)
+  if (mutt_log_get_level () > 0)
     mutt_log_init (ReleaseDate, Homedir);
 #endif
 
