@@ -139,6 +139,7 @@ int mutt_log_init (const char *reldate, const char *homedir);
 int mutt_log_set_level (int level);
 int mutt_log_get_level (void);
 void mutt_log (int level, const char *, ...);
+void mutt_log_append (int level, const char *, ...);
 
 # else
 

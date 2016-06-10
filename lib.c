@@ -1053,9 +1053,8 @@ int mutt_log_get_level (void)
   return debuglevel;
 }
 
-void mutt_log (int level, const char *fmt, ...)
+static void mutt_vlog (int level, int print_time, const char *fmt, va_list vl)
 {
-  va_list ap;
   time_t now = time (NULL);
   static char buf[23] = "";
   static time_t last = 0;
@@ -1063,14 +1062,35 @@ void mutt_log (int level, const char *fmt, ...)
   if (debuglevel < level || !debugfile)
     return;
 
-  if (now > last)
+  if (print_time)
   {
-    strftime (buf, sizeof (buf), "%Y-%m-%d %H:%M:%S", localtime (&now));
-    last = now;
+    if (now > last)
+    {
+      strftime (buf, sizeof (buf), "%Y-%m-%d %H:%M:%S", localtime (&now));
+      last = now;
+    }
+
+    fprintf (debugfile, "[%s] ", buf);
   }
-  fprintf (debugfile, "[%s] ", buf);
+
+  vfprintf (debugfile, fmt, vl);
+}
+
+void mutt_log (int level, const char *fmt, ...)
+{
+  va_list ap;
+
   va_start (ap, fmt);
-  vfprintf (debugfile, fmt, ap);
+  mutt_vlog (level, 1, fmt, ap);
+  va_end (ap);
+}
+
+void mutt_log_append (int level, const char *fmt, ...)
+{
+  va_list ap;
+
+  va_start (ap, fmt);
+  mutt_vlog (level, 0, fmt, ap);
   va_end (ap);
 }
 #endif
