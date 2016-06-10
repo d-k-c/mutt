@@ -51,7 +51,7 @@
 #include "lib.h"
 
 #ifdef DEBUG
-FILE *debugfile = NULL;
+static FILE *debugfile = NULL;
 static int debuglevel = 0;
 #endif
 
