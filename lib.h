@@ -141,10 +141,31 @@ void mutt_log_append (int level, const char *, ...);
 
 # else
 
-#define mutt_log(...) do { } while (0)
+static inline int mutt_log_init (const char *path, const char *reldate)
+{
+  return -1;
+}
 
-# endif
+static inline int mutt_log_set_level(int level)
+{
+  return -1;
+}
 
+static inline int mutt_log_get_level(void)
+{
+  return 0;
+}
+
+static inline void mutt_log (int level, const char *fmt, ...)
+{
+
+}
+
+static inline void mutt_log_append (int level, const char *fmt, ...)
+{
+
+}
+#endif
 
 /* Exit values used in send_msg() */
 #define S_ERR 127

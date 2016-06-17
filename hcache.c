@@ -931,10 +931,13 @@ hcache_open_tc (struct header_cache* h, const char* path)
     return 0;
   else
   {
-#ifdef DEBUG
-    int ecode = tcbdbecode (h->db);
-    mutt_log (2, "tcbdbopen failed for %s: %s (ecode %d)\n", path, tcbdberrmsg (ecode), ecode);
-#endif
+    if (mutt_log_get_level () >= 2)
+    {
+      int ecode = tcbdbecode (h->db);
+      mutt_log (2, "tcbdbopen failed for %s: %s (ecode %d)\n",
+                path, tcbdberrmsg (ecode), ecode);
+    }
+
     tcbdbdel(h->db);
     return -1;
   }
@@ -948,10 +951,12 @@ mutt_hcache_close(header_cache_t *h)
 
   if (!tcbdbclose(h->db))
   {
-#ifdef DEBUG
-    int ecode = tcbdbecode (h->db);
-    mutt_log (2, "tcbdbclose failed for %s: %s (ecode %d)\n", h->folder, tcbdberrmsg (ecode), ecode);
-#endif
+    if (mutt_log_get_level () >= 2)
+    {
+      int ecode = tcbdbecode (h->db);
+      mutt_log (2, "tcbdbclose failed for %s: %s (ecode %d)\n",
+                h->folder, tcbdberrmsg (ecode), ecode);
+    }
   }
   tcbdbdel(h->db);
   FREE(&h->folder);

@@ -533,7 +533,7 @@ _mutt_copy_message (FILE *fpout, FILE *fpin, HEADER *hdr, BODY *body,
       if (copy_delete_attach (body, fpin, fpout, date))
 	return -1;
 
-#ifdef DEBUG
+      if (mutt_log_get_level () > 0)
       {
 	LOFF_T fail = ((ftello (fpout) - new_offset) - new_length);
 
@@ -544,7 +544,6 @@ _mutt_copy_message (FILE *fpout, FILE *fpin, HEADER *hdr, BODY *body,
 	  mutt_sleep (1);
 	}
       }
-#endif
 
       /* Update original message if we are sync'ing a mailfolder */ 
       if (flags & MUTT_CM_UPDATE)

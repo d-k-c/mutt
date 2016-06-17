@@ -1349,7 +1349,6 @@ static int parse_alias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
   mutt_group_context_add_adrlist (gc, tmp->addr);
   mutt_alias_add_reverse (tmp);
 
-#ifdef DEBUG
   if (mutt_log_get_level () >= 2)
   {
     ADDRESS *a;
@@ -1364,7 +1363,7 @@ static int parse_alias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
 		    a->mailbox);
     }
   }
-#endif
+
   mutt_group_context_destroy (&gc);
   return 0;
   
@@ -2939,11 +2938,9 @@ void mutt_init (int skip_sys_rc, LIST *commands)
     Shell = safe_strdup ((p = getenv ("SHELL")) ? p : "/bin/sh");
   }
 
-#ifdef DEBUG
   /* Start up debugging mode if requested */
   if (mutt_log_get_level () > 0)
     mutt_log_init (ReleaseDate, Homedir);
-#endif
 
   /* And about the host... */
 

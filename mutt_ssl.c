@@ -546,11 +546,13 @@ static void ssl_err (sslsockdata *data, int err)
 
 static void ssl_dprint_err_stack (void)
 {
-#ifdef DEBUG
   BIO *bio;
   char *buf = NULL;
   long buflen;
   char *output;
+  
+  if (mutt_log_get_level () < 1)
+    return;
 
   if (! (bio = BIO_new (BIO_s_mem ())))
     return;
@@ -564,7 +566,6 @@ static void ssl_dprint_err_stack (void)
     FREE (&output);
   }
   BIO_free (bio);
-#endif
 }
 
 
@@ -664,8 +665,7 @@ static int check_certificate_by_signer (X509 *peercert)
   X509_STORE_CTX_init (&xsc, ctx, peercert, SslSessionCerts);
 
   pass = (X509_verify_cert (&xsc) > 0);
-#ifdef DEBUG
-  if (! pass)
+  if (! pass && mutt_log_get_level () >= 2)
   {
     char buf[SHORT_STRING];
     int err;
@@ -676,7 +676,7 @@ static int check_certificate_by_signer (X509 *peercert)
     mutt_log (2, "X509_verify_cert: %s\n", buf);
     mutt_log (2, " [%s]\n", peercert->name);
   }
-#endif
+
   X509_STORE_CTX_cleanup (&xsc);
   X509_STORE_free (ctx);
 

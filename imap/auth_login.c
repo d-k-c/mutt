@@ -49,10 +49,8 @@ imap_auth_res_t imap_auth_login (IMAP_DATA* idata, const char* method)
   imap_quote_string (q_user, sizeof (q_user), idata->conn->account.user);
   imap_quote_string (q_pass, sizeof (q_pass), idata->conn->account.pass);
 
-#ifdef DEBUG
   mutt_log (2, "Sending LOGIN command for %s...\n",
             idata->conn->account.user);
-#endif
 
   snprintf (buf, sizeof (buf), "LOGIN %s %s", q_user, q_pass);
   rc = imap_exec (idata, buf, IMAP_CMD_FAIL_OK | IMAP_CMD_PASS);

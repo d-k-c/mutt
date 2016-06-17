@@ -85,10 +85,8 @@ imap_auth_res_t imap_auth_gss (IMAP_DATA* idata, const char* method)
   gss_buffer_t sec_token;
   gss_name_t target_name;
   gss_ctx_id_t context;
-#ifdef DEBUG
   gss_OID mech_name;
   char server_conf_flags;
-#endif
   gss_qop_t quality;
   int cflags;
   OM_uint32 maj_stat, min_stat;
@@ -113,7 +111,6 @@ imap_auth_res_t imap_auth_gss (IMAP_DATA* idata, const char* method)
     mutt_log (2, "Couldn't get service name for [%s]\n", buf1);
     return IMAP_AUTH_UNAVAIL;
   }
-#ifdef DEBUG	
   else if (mutt_log_get_level () >= 2)
   {
     maj_stat = gss_display_name (&min_stat, target_name, &request_buf,
@@ -122,7 +119,7 @@ imap_auth_res_t imap_auth_gss (IMAP_DATA* idata, const char* method)
       (char*) request_buf.value);
     maj_stat = gss_release_buffer (&min_stat, &request_buf);
   }
-#endif
+
   /* Acquire initial credentials - without a TGT GSSAPI is UNAVAIL */
   sec_token = GSS_C_NO_BUFFER;
   context = GSS_C_NO_CONTEXT;
@@ -231,9 +228,7 @@ imap_auth_res_t imap_auth_gss (IMAP_DATA* idata, const char* method)
   mutt_log (2, "Credential exchange complete\n");
 
   /* first octet is security levels supported. We want NONE */
-#ifdef DEBUG
   server_conf_flags = ((char*) send_token.value)[0];
-#endif
   if ( !(((char*) send_token.value)[0] & GSS_AUTH_P_NONE) )
   {
     mutt_log (2, "Server requires integrity or privacy\n");

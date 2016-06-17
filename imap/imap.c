@@ -234,9 +234,8 @@ int imap_read_literal (FILE* fp, IMAP_DATA* idata, long bytes, progress_t* pbar)
 
     if (pbar && !(pos % 1024))
       mutt_progress_update (pbar, pos, -1);
-#ifdef DEBUG
+
     mutt_log_append (IMAP_LOG_LTRL, "%c", c);
-#endif
   }
 
   return 0;
@@ -717,7 +716,6 @@ static int imap_open_mailbox (CONTEXT* ctx)
     ctx->readonly = 1;
   }
 
-#ifdef DEBUG
   /* dump the mailbox flags we've found */
   if (mutt_log_get_level () > 2)
   {
@@ -738,7 +736,6 @@ static int imap_open_mailbox (CONTEXT* ctx)
       mutt_log (3, "\n");
     }
   }
-#endif
 
   if (!(mutt_bit_isset(idata->ctx->rights, MUTT_ACL_DELETE) ||
         mutt_bit_isset(idata->ctx->rights, MUTT_ACL_SEEN) ||
