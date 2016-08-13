@@ -138,13 +138,11 @@ extern FILE *debugfile;
 int mutt_log_init (const char *reldate, const char *homedir);
 int mutt_log_set_level (int level);
 int mutt_log_get_level (void);
-void mutt_debug (FILE *, const char *, ...);
-
-#  define dprint(N,X) do { if(mutt_log_get_level()>=N && debugfile) mutt_debug X; } while (0)
+void mutt_log (int level, const char *, ...);
 
 # else
 
-#  define dprint(N,X) do { } while (0)
+#define mutt_log(...) do { } while (0)
 
 # endif
 

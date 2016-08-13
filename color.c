@@ -266,8 +266,8 @@ int mutt_alloc_color (int fg, int bg)
 
   init_pair(i, fg, bg);
 
-  dprint (3, (debugfile,"mutt_alloc_color(): Color pairs used so far: %d\n",
-	      UserColors));
+  mutt_log (3, "mutt_alloc_color(): Color pairs used so far: %d\n",
+	      UserColors);
 
   return (COLOR_PAIR (p->index));
 }
@@ -285,8 +285,8 @@ void mutt_free_color (int fg, int bg)
       if (p->count > 0) return;
 
       UserColors--;
-      dprint(1,(debugfile,"mutt_free_color(): Color pairs used so far: %d\n",
-                           UserColors));
+      mutt_log (1, "mutt_free_color(): Color pairs used so far: %d\n",
+                           UserColors);
 
       if (p == ColorList)
       {
@@ -476,8 +476,8 @@ static int _mutt_parse_uncolor (BUFFER *buf, BUFFER *s, unsigned long data,
 	{
           if (!do_cache)
 	    do_cache = 1;
-	  dprint(1,(debugfile,"Freeing pattern \"%s\" from color list\n",
-	                       tmp->pattern));
+	  mutt_log (1, "Freeing pattern \"%s\" from color list\n",
+	                       tmp->pattern);
 	  if (last)
 	    last->next = tmp->next;
 	  else

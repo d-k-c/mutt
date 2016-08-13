@@ -308,8 +308,8 @@ void mutt_decode_base64 (STATE *s, long len, int istext, iconv_t cd)
     {
       /* "i" may be zero if there is trailing whitespace, which is not an error */
       if (i != 0)
-	dprint (2, (debugfile, "%s:%d [mutt_decode_base64()]: "
-	      "didn't get a multiple of 4 chars.\n", __FILE__, __LINE__));
+	mutt_log (2, "%s:%d [mutt_decode_base64()]: "
+	      "didn't get a multiple of 4 chars.\n", __FILE__, __LINE__);
       break;
     }
 
@@ -1280,7 +1280,7 @@ static int multipart_handler (BODY *a, STATE *s)
     if (rc)
     {
       mutt_error (_("One or more parts of this message could not be displayed"));
-      dprint (1, (debugfile, "Failed on attachment #%d, type %s/%s.\n", count, TYPE(p), NONULL (p->subtype)));
+      mutt_log (1, "Failed on attachment #%d, type %s/%s.\n", count, TYPE(p), NONULL (p->subtype));
     }
     
     if ((s->flags & MUTT_REPLYING)
@@ -1623,7 +1623,7 @@ static int run_decode_and_handler (BODY *b, STATE *s, handler_t handler, int pla
       if ((s->fpout = safe_fopen (tempfile, "w")) == NULL)
       {
         mutt_error _("Unable to open temporary file!");
-        dprint (1, (debugfile, "Can't open %s.\n", tempfile));
+        mutt_log (1, "Can't open %s.\n", tempfile);
         return -1;
       }
       /* decoding the attachment changes the size and offset, so save a copy
@@ -1671,7 +1671,7 @@ static int run_decode_and_handler (BODY *b, STATE *s, handler_t handler, int pla
 
     if (rc)
     {
-      dprint (1, (debugfile, "Failed on attachment of type %s/%s.\n", TYPE(b), NONULL (b->subtype)));
+      mutt_log (1, "Failed on attachment of type %s/%s.\n", TYPE(b), NONULL (b->subtype));
     }
 
     if (decode)
@@ -1783,8 +1783,8 @@ int mutt_body_handler (BODY *b, STATE *s)
     if (b->encoding != ENC7BIT && b->encoding != ENC8BIT
         && b->encoding != ENCBINARY)
     {
-      dprint (1, (debugfile, "Bad encoding type %d for multipart entity, "
-                  "assuming 7 bit\n", b->encoding));
+      mutt_log (1, "Bad encoding type %d for multipart entity, "
+                  "assuming 7 bit\n", b->encoding);
       b->encoding = ENC7BIT;
     }
   }
@@ -1838,7 +1838,7 @@ int mutt_body_handler (BODY *b, STATE *s)
   s->flags = oflags | (s->flags & MUTT_FIRSTDONE);
   if (rc)
   {
-    dprint (1, (debugfile, "Bailing on attachment of type %s/%s.\n", TYPE(b), NONULL (b->subtype)));
+    mutt_log (1, "Bailing on attachment of type %s/%s.\n", TYPE(b), NONULL (b->subtype));
   }
 
   return rc;

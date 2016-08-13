@@ -111,7 +111,7 @@ int mutt_ssl_starttls (CONNECTION* conn)
    */
   if (! (ssldata->ctx = SSL_CTX_new (SSLv23_client_method())))
   {
-    dprint (1, (debugfile, "mutt_ssl_starttls: Error allocating SSL_CTX\n"));
+    mutt_log (1, "mutt_ssl_starttls: Error allocating SSL_CTX\n");
     goto bail_ssldata;
   }
 #ifdef SSL_OP_NO_TLSv1_2
@@ -135,7 +135,7 @@ int mutt_ssl_starttls (CONNECTION* conn)
 #endif
   if (! SSL_CTX_set_options(ssldata->ctx, ssl_options))
   {
-    dprint(1, (debugfile, "mutt_ssl_starttls: Error setting options to %ld\n", ssl_options));
+    mutt_log (1, "mutt_ssl_starttls: Error setting options to %ld\n", ssl_options);
     goto bail_ctx;
   }
 
@@ -143,20 +143,20 @@ int mutt_ssl_starttls (CONNECTION* conn)
 
   if (SslCiphers) {
     if (!SSL_CTX_set_cipher_list (ssldata->ctx, SslCiphers)) {
-      dprint (1, (debugfile, "mutt_ssl_starttls: Could not select preferred ciphers\n"));
+      mutt_log (1, "mutt_ssl_starttls: Could not select preferred ciphers\n");
       goto bail_ctx;
     }
   }
 
   if (! (ssldata->ssl = SSL_new (ssldata->ctx)))
   {
-    dprint (1, (debugfile, "mutt_ssl_starttls: Error allocating SSL\n"));
+    mutt_log (1, "mutt_ssl_starttls: Error allocating SSL\n");
     goto bail_ctx;
   }
 
   if (SSL_set_fd (ssldata->ssl, conn->fd) != 1)
   {
-    dprint (1, (debugfile, "mutt_ssl_starttls: Error setting fd\n"));
+    mutt_log (1, "mutt_ssl_starttls: Error setting fd\n");
     goto bail_ssl;
   }
 
@@ -541,7 +541,7 @@ static void ssl_err (sslsockdata *data, int err)
     errmsg = "unknown error";
   }
 
-  dprint (1, (debugfile, "SSL error: %s\n", errmsg));
+  mutt_log (1, "SSL error: %s\n", errmsg);
 }
 
 static void ssl_dprint_err_stack (void)
@@ -560,7 +560,7 @@ static void ssl_dprint_err_stack (void)
     output = safe_malloc (buflen + 1);
     memcpy (output, buf, buflen);
     output[buflen] = '\0';
-    dprint (1, (debugfile, "SSL error stack: %s\n", output));
+    mutt_log (1, "SSL error stack: %s\n", output);
     FREE (&output);
   }
   BIO_free (bio);
@@ -643,13 +643,13 @@ static int check_certificate_by_signer (X509 *peercert)
     if (X509_STORE_set_default_paths (ctx))
       pass++;
     else
-      dprint (2, (debugfile, "X509_STORE_set_default_paths failed\n"));
+      mutt_log (2, "X509_STORE_set_default_paths failed\n");
   }
 
   if (X509_STORE_load_locations (ctx, SslCertFile, NULL))
     pass++;
   else
-    dprint (2, (debugfile, "X509_STORE_load_locations failed\n"));
+    mutt_log (2, "X509_STORE_load_locations failed\n");
 
   for (i = 0; i < sk_X509_num (SslSessionCerts); i++)
     pass += (X509_STORE_add_cert (ctx, sk_X509_value (SslSessionCerts, i)) != 0);
@@ -673,8 +673,8 @@ static int check_certificate_by_signer (X509 *peercert)
     err = X509_STORE_CTX_get_error (&xsc);
     snprintf (buf, sizeof (buf), "%s (%d)",
 	X509_verify_cert_error_string(err), err);
-    dprint (2, (debugfile, "X509_verify_cert: %s\n", buf));
-    dprint (2, (debugfile, " [%s]\n", peercert->name));
+    mutt_log (2, "X509_verify_cert: %s\n", buf);
+    mutt_log (2, " [%s]\n", peercert->name);
   }
 #endif
   X509_STORE_CTX_cleanup (&xsc);
@@ -743,14 +743,14 @@ static int check_certificate_by_digest (X509 *peercert)
   {
     if (X509_cmp_current_time (X509_get_notBefore (peercert)) >= 0)
     {
-      dprint (2, (debugfile, "Server certificate is not yet valid\n"));
+      mutt_log (2, "Server certificate is not yet valid\n");
       mutt_error (_("Server certificate is not yet valid"));
       mutt_sleep (2);
       return 0;
     }
     if (X509_cmp_current_time (X509_get_notAfter (peercert)) <= 0)
     {
-      dprint (2, (debugfile, "Server certificate has expired"));
+      mutt_log (2, "Server certificate has expired");
       mutt_error (_("Server certificate has expired"));
       mutt_sleep (2);
       return 0;
@@ -922,7 +922,7 @@ out:
 
 static int ssl_cache_trusted_cert (X509 *c)
 {
-  dprint (1, (debugfile, "trusted: %s\n", c->name));
+  mutt_log (1, "trusted: %s\n", c->name);
   if (!SslSessionCerts)
     SslSessionCerts = sk_X509_new_null();
   return (sk_X509_push (SslSessionCerts, X509_dup(c)));
@@ -938,7 +938,7 @@ static int ssl_check_preauth (X509 *cert, const char* host)
   /* check session cache first */
   if (check_certificate_cache (cert))
   {
-    dprint (2, (debugfile, "ssl_check_preauth: using cached certificate\n"));
+    mutt_log (2, "ssl_check_preauth: using cached certificate\n");
     return 1;
   }
 
@@ -951,19 +951,19 @@ static int ssl_check_preauth (X509 *cert, const char* host)
       mutt_sleep (2);
       return -1;
     }
-    dprint (2, (debugfile, "ssl_check_preauth: hostname check passed\n"));
+    mutt_log (2, "ssl_check_preauth: hostname check passed\n");
   }
 
   if (check_certificate_by_signer (cert))
   {
-    dprint (2, (debugfile, "ssl_check_preauth: signer check passed\n"));
+    mutt_log (2, "ssl_check_preauth: signer check passed\n");
     return 1;
   }
 
   /* automatic check from user's database */
   if (SslCertFile && check_certificate_by_digest (cert))
   {
-    dprint (2, (debugfile, "ssl_check_preauth: digest check passed\n"));
+    mutt_log (2, "ssl_check_preauth: digest check passed\n");
     return 1;
   }
 
@@ -1017,7 +1017,7 @@ static int interactive_check_cert (X509 *cert, int idx, int len)
   FILE *fp;
   char *name = NULL, *c;
 
-  dprint (2, (debugfile, "interactive_check_cert: %s\n", cert->name));
+  mutt_log (2, "interactive_check_cert: %s\n", cert->name);
 
   menu->max = 19;
   menu->dialog = (char **) safe_calloc (1, menu->max * sizeof (char *));
@@ -1029,7 +1029,7 @@ static int interactive_check_cert (X509 *cert, int idx, int len)
   row++;
   name = X509_NAME_oneline (X509_get_subject_name (cert),
 			    buf, sizeof (buf));
-  dprint (2, (debugfile, "oneline: %s\n", name));
+  mutt_log (2, "oneline: %s\n", name);
 
   for (i = 0; i < 5; i++)
   {
@@ -1123,7 +1123,7 @@ static int interactive_check_cert (X509 *cert, int idx, int len)
   }
   unset_option(OPTIGNOREMACROEVENTS);
   mutt_menuDestroy (&menu);
-  dprint (2, (debugfile, "ssl interactive_check_cert: done=%d\n", done));
+  mutt_log (2, "ssl interactive_check_cert: done=%d\n", done);
   return (done == 2);
 }
 
@@ -1131,7 +1131,7 @@ static void ssl_get_client_cert(sslsockdata *ssldata, CONNECTION *conn)
 {
   if (SslClientCert)
   {
-    dprint (2, (debugfile, "Using client certificate %s\n", SslClientCert));
+    mutt_log (2, "Using client certificate %s\n", SslClientCert);
     SSL_CTX_set_default_passwd_cb_userdata(ssldata->ctx, &conn->account);
     SSL_CTX_set_default_passwd_cb(ssldata->ctx, ssl_passwd_cb);
     SSL_CTX_use_certificate_file(ssldata->ctx, SslClientCert, SSL_FILETYPE_PEM);
@@ -1149,8 +1149,8 @@ static int ssl_passwd_cb(char *buf, int size, int rwflag, void *userdata)
   if (mutt_account_getuser (account))
     return 0;
 
-  dprint (2, (debugfile, "ssl_passwd_cb: getting password for %s@%s:%u\n",
-	      account->user, account->host, account->port));
+  mutt_log (2, "ssl_passwd_cb: getting password for %s@%s:%u\n",
+	      account->user, account->host, account->port);
 
   if (mutt_account_getpass (account))
     return 0;

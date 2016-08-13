@@ -1263,7 +1263,7 @@ ci_send_message (int flags,		/* send mode */
 
     if (!tempfp)
     {
-      dprint(1,(debugfile, "newsend_message: can't create tempfile %s (errno=%d)\n", msg->content->filename, errno));
+      mutt_log (1, "newsend_message: can't create tempfile %s (errno=%d)\n", msg->content->filename, errno);
       mutt_perror (msg->content->filename);
       goto cleanup;
     }

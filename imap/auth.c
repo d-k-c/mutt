@@ -69,7 +69,7 @@ int imap_authenticate (IMAP_DATA* idata)
       if (! method[0])
 	continue;
       
-      dprint (2, (debugfile, "imap_authenticate: Trying method %s\n", method));
+      mutt_log (2, "imap_authenticate: Trying method %s\n", method);
       authenticator = imap_authenticators;
 
       while (authenticator->authenticate)
@@ -92,7 +92,7 @@ int imap_authenticate (IMAP_DATA* idata)
   else
   {
     /* Fall back to default: any authenticator */
-    dprint (2, (debugfile, "imap_authenticate: Using any available method.\n"));
+    mutt_log (2, "imap_authenticate: Using any available method.\n");
     authenticator = imap_authenticators;
 
     while (authenticator->authenticate)

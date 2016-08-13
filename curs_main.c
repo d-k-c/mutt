@@ -694,7 +694,7 @@ int mutt_index_menu (void)
 
       op = km_dokey (MENU_MAIN);
 
-      dprint(4, (debugfile, "mutt_index_menu[%d]: Got op %d\n", __LINE__, op));
+      mutt_log (4, "mutt_index_menu[%d]: Got op %d\n", __LINE__, op);
 
       if (op == -1)
 	continue; /* either user abort or timeout */

@@ -49,7 +49,7 @@ int mutt_complete (char *s, size_t slen)
 #ifdef USE_IMAP
   char imap_path[LONG_STRING];
 
-  dprint (2, (debugfile, "mutt_complete: completing %s\n", s));
+  mutt_log (2, "mutt_complete: completing %s\n", s);
 
   /* we can use '/' as a delimiter, imap_complete rewrites it */
   if (*s == '=' || *s == '+' || *s == '!')
@@ -122,7 +122,7 @@ int mutt_complete (char *s, size_t slen)
 
   if (dirp == NULL)
   {
-    dprint (1, (debugfile, "mutt_complete(): %s: %s (errno %d).\n", exp_dirpart, strerror (errno), errno));
+    mutt_log (1, "mutt_complete(): %s: %s (errno %d).\n", exp_dirpart, strerror (errno), errno);
     return (-1);
   }
 

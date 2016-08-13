@@ -239,13 +239,13 @@ int mutt_extract_token (BUFFER *dest, BUFFER *tok, int flags)
       } while (pc && *pc != '`');
       if (!pc)
       {
-	dprint (1, (debugfile, "mutt_get_token: mismatched backticks\n"));
+	mutt_log (1, "mutt_get_token: mismatched backticks\n");
 	return (-1);
       }
       cmd = mutt_substrdup (tok->dptr, pc);
       if ((pid = mutt_create_filter (cmd, NULL, &fp, NULL)) < 0)
       {
-	dprint (1, (debugfile, "mutt_get_token: unable to fork command: %s", cmd));
+	mutt_log (1, "mutt_get_token: unable to fork command: %s", cmd);
 	FREE (&cmd);
 	return (-1);
       }
@@ -921,13 +921,13 @@ static int parse_attach_list (BUFFER *buf, BUFFER *s, LIST **ldata, BUFFER *err)
 
   /* Find the last item in the list that data points to. */
   lastp = NULL;
-  dprint(5, (debugfile, "parse_attach_list: ldata = %p, *ldata = %p\n",
-	      (void *)ldata, (void *)*ldata));
+  mutt_log (5, "parse_attach_list: ldata = %p, *ldata = %p\n",
+	      (void *)ldata, (void *)*ldata);
   for (listp = *ldata; listp; listp = listp->next)
   {
     a = (ATTACH_MATCH *)listp->data;
-    dprint(5, (debugfile, "parse_attach_list: skipping %s/%s\n",
-		a->major, a->minor));
+    mutt_log (5, "parse_attach_list: skipping %s/%s\n",
+		a->major, a->minor);
     lastp = listp;
   }
 
@@ -979,8 +979,8 @@ static int parse_attach_list (BUFFER *buf, BUFFER *s, LIST **ldata, BUFFER *err)
       return -1;
     }
 
-    dprint(5, (debugfile, "parse_attach_list: added %s/%s [%d]\n",
-		a->major, a->minor, a->major_int));
+    mutt_log (5, "parse_attach_list: added %s/%s [%d]\n",
+		a->major, a->minor, a->major_int);
 
     listp = safe_malloc(sizeof(LIST));
     listp->data = (char *)a;
@@ -1037,12 +1037,12 @@ static int parse_unattach_list (BUFFER *buf, BUFFER *s, LIST **ldata, BUFFER *er
     for(lp = *ldata; lp; )
     {
       a = (ATTACH_MATCH *)lp->data;
-      dprint(5, (debugfile, "parse_unattach_list: check %s/%s [%d] : %s/%s [%d]\n",
-		  a->major, a->minor, a->major_int, tmp, minor, major));
+      mutt_log (5, "parse_unattach_list: check %s/%s [%d] : %s/%s [%d]\n",
+		  a->major, a->minor, a->major_int, tmp, minor, major);
       if (a->major_int == major && !mutt_strcasecmp(minor, a->minor))
       {
-	dprint(5, (debugfile, "parse_unattach_list: removed %s/%s [%d]\n",
-		    a->major, a->minor, a->major_int));
+	mutt_log (5, "parse_unattach_list: removed %s/%s [%d]\n",
+		    a->major, a->minor, a->major_int);
 	regfree(&a->minor_rx);
 	FREE(&a->major);
 
@@ -1330,8 +1330,8 @@ static int parse_alias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
   }
 
   mutt_extract_token (buf, s, MUTT_TOKEN_QUOTE | MUTT_TOKEN_SPACE | MUTT_TOKEN_SEMICOLON);
-  dprint (3, (debugfile, "parse_alias: Second token is '%s'.\n",
-	      buf->data));
+  mutt_log (3, "parse_alias: Second token is '%s'.\n",
+	      buf->data);
 
   tmp->addr = mutt_parse_adrlist (tmp->addr, buf->data);
 
@@ -1357,11 +1357,11 @@ static int parse_alias (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
     for (a = tmp->addr; a && a->mailbox; a = a->next)
     {
       if (!a->group)
-	dprint (3, (debugfile, "parse_alias:   %s\n",
-		    a->mailbox));
+	mutt_log (3, "parse_alias:   %s\n",
+		    a->mailbox);
       else
-	dprint (3, (debugfile, "parse_alias:   Group %s\n",
-		    a->mailbox));
+	mutt_log (3, "parse_alias:   Group %s\n",
+		    a->mailbox);
     }
   }
 #endif
@@ -2260,8 +2260,8 @@ static int source_rc (const char *rcfile, BUFFER *err)
   size_t buflen;
   pid_t pid;
 
-  dprint (2, (debugfile, "Reading configuration file '%s'.\n",
-	  rcfile));
+  mutt_log (2, "Reading configuration file '%s'.\n",
+	  rcfile);
   
   if ((f = mutt_open_read (rcfile, &pid)) == NULL)
   {
