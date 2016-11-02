@@ -230,6 +230,7 @@ struct option_t MuttVars[] = {
   ** .dt %m  .dd major MIME type
   ** .dt %M  .dd MIME subtype
   ** .dt %n  .dd attachment number
+  ** .dt %p  .dd pretty name for content-disposition header
   ** .dt %Q  .dd ``Q'', if MIME part qualifies for attachment counting
   ** .dt %s  .dd size
   ** .dt %t  .dd tagged flag

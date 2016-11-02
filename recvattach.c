@@ -167,6 +167,7 @@ ATTACHPTR **mutt_gen_attach_list (BODY *m,
  * %m = major MIME type
  * %M = MIME subtype
  * %n = attachment number
+ * %p = pretty name for content-disposition header
  * %s = size
  * %u = unlink 
  */
@@ -306,6 +307,12 @@ const char *mutt_attach_fmt (char *dest,
 	snprintf (fmt, sizeof (fmt), "%%%sd", prefix);
 	snprintf (dest, destlen, fmt, aptr->num + 1);
       }
+      break;
+    case 'p':
+      if (!optional && aptr->content->d_filename)
+        mutt_format_s (dest, destlen, prefix, aptr->content->d_filename);
+      else if (!aptr->content->d_filename)
+        optional = 0;
       break;
     case 'Q':
       if (optional)
