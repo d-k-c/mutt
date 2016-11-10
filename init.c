@@ -2851,8 +2851,8 @@ static void start_debug (void)
   if ((debugfile = safe_fopen(buf, "w")) != NULL)
   {
     setbuf (debugfile, NULL); /* don't buffer the debugging output! */
-    dprint(1,(debugfile,"Mutt/%s (%s) debugging at level %d\n",
-	      MUTT_VERSION, ReleaseDate, debuglevel));
+    dprint(1,(debugfile,"Mutt/" MUTT_VERSION " (%s) debugging at level %d\n",
+	      ReleaseDate, debuglevel));
   }
 }
 #endif
@@ -3127,11 +3127,11 @@ void mutt_init (int skip_sys_rc, LIST *commands)
   
   if (!Muttrc)
   {
-    snprintf (buffer, sizeof(buffer), "%s/.muttrc-%s", NONULL(Homedir), MUTT_VERSION);
+    snprintf (buffer, sizeof(buffer), "%s/.muttrc-" MUTT_VERSION, NONULL(Homedir));
     if (access(buffer, F_OK) == -1)
       snprintf (buffer, sizeof(buffer), "%s/.muttrc", NONULL(Homedir));
     if (access(buffer, F_OK) == -1)
-      snprintf (buffer, sizeof (buffer), "%s/.mutt/muttrc-%s", NONULL(Homedir), MUTT_VERSION);
+      snprintf (buffer, sizeof (buffer), "%s/.mutt/muttrc-" MUTT_VERSION, NONULL(Homedir));
     if (access(buffer, F_OK) == -1)
       snprintf (buffer, sizeof (buffer), "%s/.mutt/muttrc", NONULL(Homedir));
     if (access(buffer, F_OK) == -1) /* default to .muttrc for alias_file */
@@ -3154,11 +3154,11 @@ void mutt_init (int skip_sys_rc, LIST *commands)
      requested not to via "-n".  */
   if (!skip_sys_rc)
   {
-    snprintf (buffer, sizeof(buffer), "%s/Muttrc-%s", SYSCONFDIR, MUTT_VERSION);
+    snprintf (buffer, sizeof(buffer), "%s/Muttrc-" MUTT_VERSION, SYSCONFDIR);
     if (access (buffer, F_OK) == -1)
       snprintf (buffer, sizeof(buffer), "%s/Muttrc", SYSCONFDIR);
     if (access (buffer, F_OK) == -1)
-      snprintf (buffer, sizeof (buffer), "%s/Muttrc-%s", PKGDATADIR, MUTT_VERSION);
+      snprintf (buffer, sizeof (buffer), "%s/Muttrc-" MUTT_VERSION, PKGDATADIR);
     if (access (buffer, F_OK) == -1)
       snprintf (buffer, sizeof (buffer), "%s/Muttrc", PKGDATADIR);
     if (access (buffer, F_OK) != -1)
