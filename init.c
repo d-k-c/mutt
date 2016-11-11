@@ -2905,7 +2905,7 @@ void mutt_init (int skip_sys_rc, LIST *commands)
   struct utsname utsname;
   char *p, buffer[STRING];
   char *domain = NULL;
-  int i, default_rc = 0, need_pause = 0;
+  int i, need_pause = 0;
   BUFFER err;
 
   mutt_buffer_init (&err);
@@ -3121,24 +3121,30 @@ void mutt_init (int skip_sys_rc, LIST *commands)
    * 
    * 
    */
-  
-  
-  
-  
+
   if (!Muttrc)
   {
-    snprintf (buffer, sizeof(buffer), "%s/.muttrc-" MUTT_VERSION, NONULL(Homedir));
-    if (access(buffer, F_OK) == -1)
-      snprintf (buffer, sizeof(buffer), "%s/.muttrc", NONULL(Homedir));
-    if (access(buffer, F_OK) == -1)
-      snprintf (buffer, sizeof (buffer), "%s/.mutt/muttrc-" MUTT_VERSION, NONULL(Homedir));
-    if (access(buffer, F_OK) == -1)
-      snprintf (buffer, sizeof (buffer), "%s/.mutt/muttrc", NONULL(Homedir));
-    if (access(buffer, F_OK) == -1) /* default to .muttrc for alias_file */
-      snprintf (buffer, sizeof(buffer), "%s/.muttrc", NONULL(Homedir));
+    const char* muttrc_locations[] =
+    {
+      ".muttrc-" MUTT_VERSION,
+      ".muttrc",
+      ".mutt/muttrc-" MUTT_VERSION,
+      ".mutt/muttrc",
+      ".muttrc",
+      NULL,
+    };
+    int i;
 
-    default_rc = 1;
-    Muttrc = safe_strdup (buffer);
+    for (i = 0; muttrc_locations[i]; i++)
+    {
+      snprintf (buffer, sizeof (buffer), "%s/%s",
+                NONULL(Homedir), muttrc_locations[i]);
+      if (access (buffer, F_OK) == 0)
+      {
+        Muttrc = safe_strdup(buffer);
+        break;
+      }
+    }
   }
   else
   {
@@ -3146,9 +3152,21 @@ void mutt_init (int skip_sys_rc, LIST *commands)
     FREE (&Muttrc);
     mutt_expand_path (buffer, sizeof (buffer));
     Muttrc = safe_strdup (buffer);
+    if (access (Muttrc, F_OK))
+    {
+      snprintf (buffer, sizeof (buffer), "%s: %s", Muttrc, strerror (errno));
+      mutt_endwin (buffer);
+      exit (1);
+    }
   }
+  /*
+   * here we use buffer for the case where the for loop exits without having
+   * found a muttrc on the system. So Muttrc is not set but buffer still points
+   * to the last element in muttrc_locations.
+   */
   FREE (&AliasFile);
-  AliasFile = safe_strdup (NONULL(Muttrc));
+  AliasFile = safe_strdup (buffer);
+
 
   /* Process the global rc file if it exists and the user hasn't explicity
      requested not to via "-n".  */
@@ -3173,7 +3191,7 @@ void mutt_init (int skip_sys_rc, LIST *commands)
   }
 
   /* Read the user's initialization file.  */
-  if (access (Muttrc, F_OK) != -1)
+  if (Muttrc)
   {
     if (!option (OPTNOCURSES))
       endwin ();
@@ -3183,13 +3201,6 @@ void mutt_init (int skip_sys_rc, LIST *commands)
       fputc ('\n', stderr);
       need_pause = 1;
     }
-  }
-  else if (!default_rc)
-  {
-    /* file specified by -F does not exist */
-    snprintf (buffer, sizeof (buffer), "%s: %s", Muttrc, strerror (errno));
-    mutt_endwin (buffer);
-    exit (1);
   }
 
   if (mutt_execute_commands (commands) != 0)
