@@ -2899,7 +2899,7 @@ static void mutt_srandom (void)
   srandom(seed);
 }
 
-static char* mutt_find_cfg (const char *home)
+static char* mutt_find_cfg (const char *home, const char *xdg_cfg_home)
 {
   const char* names[] =
   {
@@ -2912,6 +2912,7 @@ static char* mutt_find_cfg (const char *home)
   {
     { home, ".", },
     { home, ".mutt/" },
+    { xdg_cfg_home, "mutt/", },
     { NULL, NULL },
   };
 
@@ -3163,7 +3164,14 @@ void mutt_init (int skip_sys_rc, LIST *commands)
 
   if (!Muttrc)
   {
-    Muttrc = mutt_find_cfg (Homedir);
+    char *xdg_cfg_home = getenv ("XDG_CONFIG_HOME");
+
+    if (!xdg_cfg_home && Homedir) {
+      snprintf (buffer, sizeof (buffer), "%s/.config", Homedir);
+      xdg_cfg_home = buffer;
+    }
+
+    Muttrc = mutt_find_cfg (Homedir, xdg_cfg_home);
   }
   else
   {
