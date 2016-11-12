@@ -3130,7 +3130,6 @@ void mutt_init (int skip_sys_rc, LIST *commands)
       ".muttrc",
       ".mutt/muttrc-" MUTT_VERSION,
       ".mutt/muttrc",
-      ".muttrc",
       NULL,
     };
     int i;
@@ -3159,14 +3158,12 @@ void mutt_init (int skip_sys_rc, LIST *commands)
       exit (1);
     }
   }
-  /*
-   * here we use buffer for the case where the for loop exits without having
-   * found a muttrc on the system. So Muttrc is not set but buffer still points
-   * to the last element in muttrc_locations.
-   */
-  FREE (&AliasFile);
-  AliasFile = safe_strdup (buffer);
 
+  if (Muttrc)
+  {
+    FREE (&AliasFile);
+    AliasFile = safe_strdup (Muttrc);
+  }
 
   /* Process the global rc file if it exists and the user hasn't explicity
      requested not to via "-n".  */
