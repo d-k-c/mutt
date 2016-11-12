@@ -2899,6 +2899,45 @@ static void mutt_srandom (void)
   srandom(seed);
 }
 
+static char* mutt_find_cfg (const char *home)
+{
+  const char* names[] =
+  {
+    "muttrc-" MUTT_VERSION,
+    "muttrc",
+    NULL,
+  };
+
+  const char* locations[][2] =
+  {
+    { home, ".", },
+    { home, ".mutt/" },
+    { NULL, NULL },
+  };
+
+  int i;
+
+  for (i = 0; locations[i][0] && locations[i][1]; i++)
+  {
+    int j;
+
+    if (!locations[i][0])
+      continue;
+
+    for (j = 0; names[j]; j++)
+    {
+      char buffer[STRING];
+
+      snprintf (buffer, sizeof (buffer),
+                "%s/%s%s", locations[i][0], locations[i][1], names[j]);
+      if (access (buffer, F_OK) == 0)
+        return safe_strdup(buffer);
+    }
+  }
+
+  return NULL;
+}
+
 void mutt_init (int skip_sys_rc, LIST *commands)
 {
   struct passwd *pw;
@@ -3124,26 +3163,7 @@ void mutt_init (int skip_sys_rc, LIST *commands)
 
   if (!Muttrc)
   {
-    const char* muttrc_locations[] =
-    {
-      ".muttrc-" MUTT_VERSION,
-      ".muttrc",
-      ".mutt/muttrc-" MUTT_VERSION,
-      ".mutt/muttrc",
-      NULL,
-    };
-    int i;
-
-    for (i = 0; muttrc_locations[i]; i++)
-    {
-      snprintf (buffer, sizeof (buffer), "%s/%s",
-                NONULL(Homedir), muttrc_locations[i]);
-      if (access (buffer, F_OK) == 0)
-      {
-        Muttrc = safe_strdup(buffer);
-        break;
-      }
-    }
+    Muttrc = mutt_find_cfg (Homedir);
   }
   else
   {
